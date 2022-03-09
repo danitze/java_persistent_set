@@ -1,45 +1,45 @@
 package com.company;
 
-public class TreeNode {
-    private TreeNode parent = null;
-    private TreeNode left = null;
-    private TreeNode right = null;
+public class TreeNode<T extends Comparable<T>> {
+    private TreeNode<T> parent = null;
+    private TreeNode<T> left = null;
+    private TreeNode<T> right = null;
 
     private Color color = Color.RED;
 
-    private int val;
+    private T val;
 
-    public TreeNode(int val) {
+    public TreeNode(T val) {
         this.val = val;
     }
 
-    public void swapValues(TreeNode node) {
-        int temp = val;
+    public void swapValues(TreeNode<T> node) {
+        T temp = val;
         val = node.val;
         node.val = temp;
     }
 
-    public TreeNode getParent() {
+    public TreeNode<T> getParent() {
         return parent;
     }
 
-    public void setParent(TreeNode parent) {
+    public void setParent(TreeNode<T> parent) {
         this.parent = parent;
     }
 
-    public TreeNode getLeft() {
+    public TreeNode<T> getLeft() {
         return left;
     }
 
-    public void setLeft(TreeNode left) {
+    public void setLeft(TreeNode<T> left) {
         this.left = left;
     }
 
-    public TreeNode getRight() {
+    public TreeNode<T> getRight() {
         return right;
     }
 
-    public void setRight(TreeNode right) {
+    public void setRight(TreeNode<T> right) {
         this.right = right;
     }
 
@@ -51,11 +51,11 @@ public class TreeNode {
         this.color = color;
     }
 
-    public int getVal() {
+    public T getVal() {
         return val;
     }
 
-    public void setVal(int val) {
+    public void setVal(T val) {
         this.val = val;
     }
 }

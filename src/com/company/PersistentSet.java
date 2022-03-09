@@ -1,14 +1,14 @@
 package com.company;
 
-public interface PersistentSet {
+public interface PersistentSet<T extends Comparable<T>> {
 
-    void insert(int val);
+    void insert(T val);
 
-    void delete(int val);
+    void delete(T val);
 
     int versionsAmount();
 
-    boolean contains(int version, int val);
+    boolean contains(int version, T val);
 
     void print(int version);
 

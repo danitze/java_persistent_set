@@ -1,12 +1,12 @@
 package com.company;
 
-public class Tree {
-    private TreeNode root = null;
+public class Tree<T extends Comparable<T>> {
+    private TreeNode<T> root = null;
     private int size = 0;
 
-    public void insert(int val) {
+    public void insert(T val) {
         ++size;
-        TreeNode node = new TreeNode(val);
+        TreeNode<T> node = new TreeNode<>(val);
         if (root == null) {
             root = node;
         } else {
@@ -15,20 +15,20 @@ public class Tree {
         fixInsert(node);
     }
 
-    public void delete(int val) {
+    public void delete(T val) {
         if (root == null) {
             return;
         }
-        TreeNode node = findNodeWithVal(root, val);
+        TreeNode<T> node = findNodeWithVal(root, val);
         if (node == null) {
             return;
         }
         --size;
         if (node.getLeft() != null && node.getRight() != null) {
-            TreeNode swappingNode = findLargest(node.getLeft());
+            TreeNode<T> swappingNode = findLargest(node.getLeft());
             node.swapValues(swappingNode);
             replaceForDelete(node.getLeft(), val);
-            node = swappingNode;
+            node = findLargest(node.getLeft());
         }
         fixDelete(node);
         delete(node);
@@ -42,12 +42,32 @@ public class Tree {
         return size;
     }
 
-    private void insertRecursive(TreeNode root, TreeNode newNode) {
-        if (newNode.getVal() == root.getVal()) {
+    public boolean contains(T val) {
+        return findElementRecursive(root, val);
+    }
+
+    public Tree<T> copyForInsert(T insertionVal) {
+        Tree<T> newTree = new Tree<>();
+        newTree.root = this.root;
+        newTree.size = this.size;
+        newTree.replaceForInsert(newTree.root, insertionVal);
+        return newTree;
+    }
+
+    public Tree<T> copyForDelete(T deleteVal) {
+        Tree<T> newTree = new Tree<>();
+        newTree.root = this.root;
+        newTree.size = this.size;
+        newTree.replaceForDelete(newTree.root, deleteVal);
+        return newTree;
+    }
+
+    private void insertRecursive(TreeNode<T> root, TreeNode<T> newNode) {
+        if (newNode.getVal().equals(root.getVal())) {
             return;
         }
-        if (newNode.getVal() < root.getVal()) {
-            TreeNode left = root.getLeft();
+        if (newNode.getVal().compareTo(root.getVal()) < 0)  {
+            TreeNode<T> left = root.getLeft();
             if (left == null) {
                 root.setLeft(newNode);
                 newNode.setParent(root);
@@ -55,7 +75,7 @@ public class Tree {
                 insertRecursive(left, newNode);
             }
         } else {
-            TreeNode right = root.getRight();
+            TreeNode<T> right = root.getRight();
             if (right == null) {
                 root.setRight(newNode);
                 newNode.setParent(root);
@@ -65,8 +85,8 @@ public class Tree {
         }
     }
 
-    private void rotateRight(TreeNode root) {
-        TreeNode newRoot = root.getLeft();
+    private void rotateRight(TreeNode<T> root) {
+        TreeNode<T> newRoot = root.getLeft();
         root.setLeft(newRoot.getRight());
         if(newRoot.getRight() != null) {
             newRoot.getRight().setParent(root);
@@ -76,8 +96,8 @@ public class Tree {
         root.setParent(newRoot);
     }
 
-    private void rotateLeft(TreeNode root) {
-        TreeNode newRoot = root.getRight();
+    private void rotateLeft(TreeNode<T> root) {
+        TreeNode<T> newRoot = root.getRight();
         root.setRight(newRoot.getLeft());
         if(newRoot.getLeft() != null) {
             newRoot.getLeft().setParent(root);
@@ -87,9 +107,9 @@ public class Tree {
         root.setParent(newRoot);
     }
 
-    private void recolor(TreeNode root) {
-        TreeNode left = root.getLeft();
-        TreeNode right = root.getRight();
+    private void recolor(TreeNode<T> root) {
+        TreeNode<T> left = root.getLeft();
+        TreeNode<T> right = root.getRight();
         if (left != null && right != null) {
             left.setColor(Color.BLACK);
             right.setColor(Color.BLACK);
@@ -97,8 +117,8 @@ public class Tree {
         }
     }
 
-    private void changeDescendant(TreeNode oldDescendant, TreeNode newDescendant) {
-        TreeNode parent = oldDescendant.getParent();
+    private void changeDescendant(TreeNode<T> oldDescendant, TreeNode<T> newDescendant) {
+        TreeNode<T> parent = oldDescendant.getParent();
         newDescendant.setParent(parent);
         if (parent == null) {
             root = newDescendant;
@@ -111,17 +131,17 @@ public class Tree {
         }
     }
 
-    private void fixInsert(TreeNode newNode) {
+    private void fixInsert(TreeNode<T> newNode) {
         if (newNode == root) {
             newNode.setColor(Color.BLACK);
             return;
         }
-        TreeNode parent = newNode.getParent();
-        TreeNode grandParent = parent.getParent();
+        TreeNode<T> parent = newNode.getParent();
+        TreeNode<T> grandParent = parent.getParent();
         if (grandParent == null) {
             return;
         }
-        TreeNode uncle = (grandParent.getLeft() == parent) ? grandParent.getRight() : grandParent.getLeft();
+        TreeNode<T> uncle = (grandParent.getLeft() == parent) ? grandParent.getRight() : grandParent.getLeft();
         if (uncle != null && parent.getColor() == Color.RED && uncle.getColor() == Color.RED) {
             recolor(grandParent);
             fixInsert(grandParent);
@@ -144,7 +164,7 @@ public class Tree {
         }
     }
 
-    private void printRecursive(TreeNode root) {
+    private void printRecursive(TreeNode<T> root) {
         if (root == null) {
             return;
         }
@@ -153,26 +173,26 @@ public class Tree {
         printRecursive(root.getRight());
     }
 
-    private TreeNode findNodeWithVal(TreeNode root, int val) {
+    private TreeNode<T> findNodeWithVal(TreeNode<T> root, T val) {
         if (root == null) {
             return null;
         }
-        if (root.getVal() == val) {
+        if (root.getVal().equals(val)) {
             return root;
         }
-        return (val < root.getVal())
+        return (val.compareTo(root.getVal()) < 0)
                 ? findNodeWithVal(root.getLeft(), val)
                 : findNodeWithVal(root.getRight(), val);
     }
 
-    private TreeNode findLargest(TreeNode root) {
+    private TreeNode<T> findLargest(TreeNode<T> root) {
         while (root.getRight() != null) {
             root = root.getRight();
         }
         return root;
     }
 
-    private void delete(TreeNode node) {
+    private void delete(TreeNode<T> node) {
         if (node == root) {
             if (node.getLeft() != null) {
                 root = node.getLeft();
@@ -185,8 +205,8 @@ public class Tree {
             }
             return;
         }
-        TreeNode parent = node.getParent();
-        TreeNode descendant = (node.getLeft() != null) ? node.getLeft() : node.getRight();
+        TreeNode<T> parent = node.getParent();
+        TreeNode<T> descendant = (node.getLeft() != null) ? node.getLeft() : node.getRight();
         node.setParent(null);
         node.setLeft(null);
         node.setRight(null);
@@ -200,13 +220,13 @@ public class Tree {
         }
     }
 
-    private void fixDelete(TreeNode node) {
+    private void fixDelete(TreeNode<T> node) {
         if (node.getColor() == Color.RED) {
             return;
         }
         if (node == root) {
-            TreeNode left = node.getLeft();
-            TreeNode right = node.getRight();
+            TreeNode<T> left = node.getLeft();
+            TreeNode<T> right = node.getRight();
             if (left != null) {
                 left.setColor(Color.BLACK);
             } else if (right != null) {
@@ -214,9 +234,9 @@ public class Tree {
             }
             return;
         }
-        TreeNode parent = node.getParent();
-        TreeNode sibling = (node == parent.getLeft()) ? parent.getRight() : parent.getLeft();
-        TreeNode outerNephew;
+        TreeNode<T> parent = node.getParent();
+        TreeNode<T> sibling = (node == parent.getLeft()) ? parent.getRight() : parent.getLeft();
+        TreeNode<T> outerNephew;
         if (sibling == null) {
             outerNephew = null;
         } else {
@@ -250,7 +270,7 @@ public class Tree {
                                 || (sibling.getRight() != null && sibling.getRight().getColor() == Color.RED)
                 )
         ) {
-            TreeNode innerNephew = (outerNephew == sibling.getLeft()) ? sibling.getRight() : sibling.getLeft();
+            TreeNode<T> innerNephew = (outerNephew == sibling.getLeft()) ? sibling.getRight() : sibling.getLeft();
             if (outerNephew == null || outerNephew.getColor() == Color.BLACK) {
                 innerNephew.setColor(Color.BLACK);
                 sibling.setColor(Color.RED);
@@ -275,54 +295,38 @@ public class Tree {
         }
     }
 
-    public Tree copyForInsert(int insertionVal) {
-        Tree newTree = new Tree();
-        newTree.root = this.root;
-        newTree.size = this.size;
-        newTree.replaceForInsert(newTree.root, insertionVal);
-        return newTree;
-    }
-
-    private void replaceForInsert(TreeNode node, int insertionVal) {
+    private void replaceForInsert(TreeNode<T> node, T insertionVal) {
         if(node == null) {
             return;
         }
         copyNode(node);
-        if(insertionVal < node.getVal()) {
+        if(insertionVal.compareTo(node.getVal()) < 0) {
             replaceForInsert(node.getLeft(), insertionVal);
         } else {
             replaceForInsert(node.getRight(), insertionVal);
         }
     }
 
-    public Tree copyForDelete(int deleteVal) {
-        Tree newTree = new Tree();
-        newTree.root = this.root;
-        newTree.size = this.size;
-        newTree.replaceForDelete(newTree.root, deleteVal);
-        return newTree;
-    }
-
-    public void replaceForDelete(TreeNode node, int deleteVal) {
+    public void replaceForDelete(TreeNode<T> node, T deleteVal) {
         copyNode(node);
-        if(node.getVal() == deleteVal) {
+        if(node.getVal().equals(deleteVal)) {
             return;
         }
-        if(deleteVal < node.getVal()) {
+        if(deleteVal.compareTo(node.getVal()) < 0) {
             replaceForDelete(node.getLeft(), deleteVal);
         } else {
             replaceForDelete(node.getRight(), deleteVal);
         }
     }
 
-    private void copyNode(TreeNode node) {
-        TreeNode newNode = new TreeNode(node.getVal());
+    private void copyNode(TreeNode<T> node) {
+        TreeNode<T> newNode = new TreeNode<>(node.getVal());
         if(node == root) {
             root = newNode;
         }
-        TreeNode parent = node.getParent();
-        TreeNode left = node.getLeft();
-        TreeNode right = node.getRight();
+        TreeNode<T> parent = node.getParent();
+        TreeNode<T> left = node.getLeft();
+        TreeNode<T> right = node.getRight();
         newNode.setParent(parent);
         if(parent != null) {
             if(node == parent.getLeft()) {
@@ -341,18 +345,14 @@ public class Tree {
         }
     }
 
-    public boolean contains(int val) {
-        return findElementRecursive(root, val);
-    }
-
-    private boolean findElementRecursive(TreeNode node, int val) {
+    private boolean findElementRecursive(TreeNode<T> node, T val) {
         if(node == null) {
             return false;
         }
-        if(node.getVal() == val) {
+        if(node.getVal().equals(val)) {
             return true;
         }
-        return (val < node.getVal())
+        return (val.compareTo(node.getVal()) < 0)
                 ? findElementRecursive(node.getLeft(), val)
                 : findElementRecursive(node.getRight(), val);
     }
