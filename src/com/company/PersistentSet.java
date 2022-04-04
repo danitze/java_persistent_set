@@ -12,6 +12,8 @@ public interface PersistentSet<T extends Comparable<T>> {
 
     void print(int version);
 
+    void printLatest();
+
     int size(int version);
 
 }

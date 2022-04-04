@@ -47,6 +47,11 @@ public class PersistentSetImpl<T extends Comparable<T>> implements PersistentSet
     }
 
     @Override
+    public void printLatest() {
+        print(versionsAmount());
+    }
+
+    @Override
     public int size(int version) {
         return trees.get(version - 1).size();
     }
